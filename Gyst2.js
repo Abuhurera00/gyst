@@ -5,6 +5,10 @@ import fs from "fs/promises";
 import crypto from "crypto";
 import { diffLines } from "diff";
 import chalk from "chalk";
+import { exec } from "child_process";
+import { promisify } from "util";
+
+const execAsync = promisify(exec);
 
 class Gyst {
     constructor(repoPath = ".") {
@@ -12,7 +16,6 @@ class Gyst {
         this.objectsPath = path.join(this.repoPath, "objects");
         this.headPath = path.join(this.repoPath, "HEAD");
         this.indexPath = path.join(this.repoPath, "index");
-        // We don’t await init() here; the caller (CLI dispatcher) will await it if needed.
     }
 
     async init() {
@@ -22,7 +25,7 @@ class Gyst {
             await fs.writeFile(this.indexPath, JSON.stringify([]), { flag: "wx" });
             console.log("Initialized empty Gyst repository in", this.repoPath);
         } catch (error) {
-            // If the folder already exists, we silently exit (no further logging).
+            // If the folder already exists, silently exit (no further logging).
         }
     }
 
@@ -173,12 +176,12 @@ class Gyst {
                         if (part.added) {
                             process.stdout.write(chalk.green("++ " + part.value));
                         } else if (part.removed) {
-                            process.stdout.write(chalk.red("--" + part.value));
+                            process.stdout.write(chalk.red("-- " + part.value));
                         } else {
                             process.stdout.write(chalk.grey(part.value));
                         }
                     });
-                    console.log("\n");
+                    console.log("");
                 } else {
                     console.log("  (New file in this commit)\n");
                 }
@@ -213,6 +216,26 @@ class Gyst {
             return "";
         }
     }
+
+    async clone(repoUrl) {
+        if (!repoUrl) {
+            console.error("Usage: gyst clone <github‑url>");
+            process.exit(1);
+        }
+
+        console.log(`Cloning ${repoUrl} ...`);
+        try {
+            // Run `git clone <repoUrl>` in the current working directory
+            const { stdout, stderr } = await execAsync(`git clone ${repoUrl}`);
+            process.stdout.write(stdout);
+            process.stderr.write(stderr);
+        } catch (err) {
+            console.error("Error during clone:", err.message);
+            process.exit(1);
+        }
+    }
+
+
 }
 
 // ─── CLI DISPATCHER ─────────────────────────────────────────────────────────────
@@ -256,6 +279,14 @@ class Gyst {
             await repo.showCommitDiff(args[0]);
             break;
 
+        case "clone":
+            if (args.length !== 1) {
+                console.error("Usage: gyst clone <github‑url>");
+                process.exit(1);
+            }
+            await repo.clone(args[0]);
+            break;
+
         default:
             console.log(`${chalk.red("Unknown command:")} ${command}\n\n
 Usage:
@@ -264,6 +295,7 @@ Usage:
   gyst commit <message>
   gyst log
   gyst diff <commit-hash>
+  gyst clone <github‑url>
 `);
             process.exit(0);
     }
