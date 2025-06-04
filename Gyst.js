@@ -25,7 +25,7 @@ class Gyst {
             await fs.writeFile(this.indexPath, JSON.stringify([]), { flag: "wx" }) // Create index file if it doesn't exist
             console.log("Initialized empty Gyst repository in", this.repoPath);
         } catch (error) {
-            console.log("Already initialized the .gyst folder.");
+            // console.log("Already initialized the .gyst folder.");
         }
     }
 
