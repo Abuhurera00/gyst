@@ -87,49 +87,6 @@ class Gyst {
         }
     }
 
-    // async showCommitDiff(commitHash) {
-    //     const commitData = JSON.parse(await this.getCommitData(commitHash)); // Read the commit data
-    //     if (!commitData) {
-    //         console.log(`Commit ${commitHash} not found.`);
-    //         return;
-    //     }
-    //     console.log(`Changes in the last commit are`);
-
-    //     for (const file of commitData.files) {
-    //         console.log(`File: ${file.path}`);
-    //         const fileContent = await this.getFileContent(file.hash); // Get the content of the file from the object store
-    //         console.log(fileContent)
-
-    //         if (commitData.parent) {
-    //             // get the parent commit data to compare
-    //             const parentCommitData = JSON.parse(await this.getCommitData(commitData.parent));
-    //             const parentFileContent = await this.getParentFileContent(parentCommitData, file.path); // Get the content of the file from the parent commit
-    //             if (this.getParentFileContent !== undefined) {
-    //                 console.log(`\nDiff:`);
-    //                 const diff = diffLines(parentFileContent, fileContent); // Calculate the difference between the parent and current file content
-
-    //                 // console.log(diff)
-
-    //                 diff.forEach(part => {
-    //                     // Highlight added and removed lines
-    //                     if (part.added) {
-    //                         process.stdout.write(chalk.green(part.value)); // Print added lines in green
-    //                     } else if (part.removed) {
-    //                         process.stdout.write(chalk.red(part.value)); // Print removed lines in red
-    //                     } else {
-    //                         process.stdout.write(chalk.grey(part.value)); // Print unchanged lines as is
-    //                     }
-    //                 });
-    //                 console.log("\n"); // new line
-    //             } else {
-    //                 console.log(`New file in this commit`);
-    //             }
-    //         } else {
-    //             console.log("First commit")
-    //         }
-    //     }
-    // }
-
 
     async showCommitDiff(commitHash) {
         const commitData = JSON.parse(await this.getCommitData(commitHash));
