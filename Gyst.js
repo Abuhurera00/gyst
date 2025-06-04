@@ -23,6 +23,7 @@ class Gyst {
         try {
             await fs.writeFile(this.headPath, "", { flag: "wx" }); // Create HEAD file if it doesn't exist wx: open for writing, fail if it already exists
             await fs.writeFile(this.indexPath, JSON.stringify([]), { flag: "wx" }) // Create index file if it doesn't exist
+            console.log("Initialized empty Gyst repository in", this.repoPath);
         } catch (error) {
             console.log("Already initialized the .gyst folder.");
         }
@@ -166,7 +167,6 @@ class Gyst {
 
 program.command("init").action(async() => {
     const gyst = new Gyst(); // Create an instance of Gyst to initialize the repository
-    console.log("Gyst repository initialized.");
 })
 
 program.command("add <file>").action(async (file) => {
